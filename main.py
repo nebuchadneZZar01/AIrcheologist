@@ -5,7 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
+from matplotlib import pyplot as plt
 
 new_model = input("Do you want to create a new model? [Y/n] ")
 if new_model.lower() == 'y':
@@ -48,12 +50,12 @@ else:
 # prediction
 path_topredict = input("Enter .csv to predict path: ")
 print("\t---RESULTS---")
-pr = pd.read_csv(path_topredict)
+to_pr = pd.read_csv(path_topredict)
 csv_res = pd.read_csv(path_topredict)
-names = pr['object']
-pr.drop('object', axis=1, inplace=True)
-pr.drop('collection', axis=1, inplace=True)
-pred = classifier.predict(pr)
+names = to_pr['object']
+to_pr.drop('object', axis=1, inplace=True)
+to_pr.drop('collection', axis=1, inplace=True)
+pred = classifier.predict(to_pr)
 
 pred_df = pd.DataFrame(pred)
 

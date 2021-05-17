@@ -1,13 +1,13 @@
 from numpy import save
 import pandas as pd
+import numpy as np
 from joblib import dump, load
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
-from matplotlib import pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
 
 new_model = input("Do you want to create a new model? [Y/n] ")
 if new_model.lower() == 'y':
@@ -28,8 +28,9 @@ if new_model.lower() == 'y':
 
     # 80% dei dati per allenamento, 20% test
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
-    # training con decision tree
-    classifier = DecisionTreeClassifier()
+    # training con random forest
+    classifier = RandomForestClassifier()
+    wanted_acc = float(input("Type wanted accuracy: "))
     while True:
         classifier.fit(X_train, y_train)
         y_pred = classifier.predict(X_test)
@@ -39,7 +40,7 @@ if new_model.lower() == 'y':
         print(classification_report(y_test, y_pred))
         print(y_pred)
         # salvataggio del modello
-        if accuracy >= 0.8:
+        if accuracy >= wanted_acc:
             dump(classifier, 'model.joblib')
             print("Model saved\n")
             break
@@ -51,11 +52,14 @@ else:
 path_topredict = input("Enter .csv to predict path: ")
 print("\t---RESULTS---")
 to_pr = pd.read_csv(path_topredict)
+to_pr.drop('objType', axis=1, inplace=True)
 csv_res = pd.read_csv(path_topredict)
 names = to_pr['object']
 to_pr.drop('object', axis=1, inplace=True)
 to_pr.drop('collection', axis=1, inplace=True)
 pred = classifier.predict(to_pr)
+
+print(names)
 
 pred_df = pd.DataFrame(pred)
 
@@ -65,7 +69,6 @@ res.rename({ 0 : 'objType'}, axis=1, inplace=True)
 print(res)
 
 csv_res = pd.concat([csv_res, pred_df], axis=1)
-csv_res.rename({ 0 : 'objType'}, axis=1, inplace=True)
 print(csv_res.head(5))
 res_name = input("Type result .csv name: ")
 csv_res.to_csv(res_name, index=False)

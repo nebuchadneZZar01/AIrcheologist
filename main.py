@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 new_model = input("Do you want to create a new model? [Y/n] ")
@@ -51,24 +50,28 @@ else:
 # prediction
 path_topredict = input("Enter .csv to predict path: ")
 print("\t---RESULTS---")
+# carico file in variabile da utilizzare e variabile di output
 to_pr = pd.read_csv(path_topredict)
-to_pr.drop('objType', axis=1, inplace=True)
 csv_res = pd.read_csv(path_topredict)
+# cancello le colonne inutili
+to_pr.drop('objType', axis=1, inplace=True)
+csv_res.drop('objType', axis=1, inplace=True)
+
 names = to_pr['object']
 to_pr.drop('object', axis=1, inplace=True)
 to_pr.drop('collection', axis=1, inplace=True)
 pred = classifier.predict(to_pr)
 
-print(names)
-
+# df contenente i valori predictati
 pred_df = pd.DataFrame(pred)
 
-# result
+# concateno per la stampa del csv di output
 res = pd.concat([names, pred_df], axis=1)
 res.rename({ 0 : 'objType'}, axis=1, inplace=True)
 print(res)
 
 csv_res = pd.concat([csv_res, pred_df], axis=1)
+csv_res.rename({ 0 : 'objType'}, axis=1, inplace=True)
 print(csv_res.head(5))
 res_name = input("Type result .csv name: ")
 csv_res.to_csv(res_name, index=False)

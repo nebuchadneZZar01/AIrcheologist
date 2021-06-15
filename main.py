@@ -1,6 +1,7 @@
 from numpy import save
 import pandas as pd
 import numpy as np
+import os
 from joblib import dump, load
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
@@ -11,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 new_model = input("Do you want to create a new model? [Y/n] ")
 if new_model.lower() == 'y':
     path_train = input("Enter .csv training source path: ")
-    dataset = pd.read_csv(path_train)
+    dataset = pd.read_csv(path_train, sep=',', skiprows=1)
     print(dataset.head(5))
 
     dataset.drop('object', axis=1, inplace=True)
@@ -51,8 +52,8 @@ else:
 path_topredict = input("Enter .csv to predict path: ")
 print("\t---RESULTS---")
 # carico file in variabile da utilizzare e variabile di output
-to_pr = pd.read_csv(path_topredict)
-csv_res = pd.read_csv(path_topredict)
+to_pr = pd.read_csv(path_topredict, sep=',', skiprows=1)
+csv_res = pd.read_csv(path_topredict, sep=',', skiprows=1)
 # cancello le colonne inutili
 to_pr.drop('objType', axis=1, inplace=True)
 csv_res.drop('objType', axis=1, inplace=True)
@@ -74,7 +75,10 @@ csv_res = pd.concat([csv_res, pred_df], axis=1)
 csv_res.rename({ 0 : 'objType'}, axis=1, inplace=True)
 print(csv_res.head(5))
 res_name = input("Type result .csv name: ")
-csv_res.to_csv(res_name, index=False)
+with open(res_name, 'w') as f:
+    f.write('sep=,\n')
+    f.close()
+    csv_res.to_csv(res_name, mode='a', sep=',', index=False)
 
 
 
